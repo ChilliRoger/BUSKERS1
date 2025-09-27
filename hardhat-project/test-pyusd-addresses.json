@@ -1,0 +1,7 @@
+{
+  "network": "kadenaTestnet",
+  "chainId": "5920",
+  "testPyusd": "0x0aD75db1a6C8B5B6d5F0398F6bd724dd0fb920AF",
+  "deployer": "0x12D63742591E497C813C4Ac33BE27cC913Bd201d",
+  "timestamp": "2025-09-27T16:19:25.779Z"
+}

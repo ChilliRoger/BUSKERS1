@@ -15,11 +15,10 @@ const config: HardhatUserConfig = {
     },
   },
   networks: {
-
     kadenaTestnet: {
-      url:"https://evm-testnet.chainweb.com/chainweb/0.0/evm-testnet/chain/20/evm/rpc",
-      chainId:  5920,
-      accounts: ["d9099c50c75b214417bdd576014ac55cf3d4270e3e1c31cb37af5a03f345c4d0"],
+      url: process.env.KADENA_TESTNET_RPC || "https://evm-testnet.chainweb.com/chainweb/0.0/evm-testnet/chain/20/evm/rpc",
+      chainId: Number(process.env.KADENA_CHAIN_ID) || 5920,
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
       gas: 8000000,
       gasPrice: 1000000000, // 1 gwei
       timeout: 60000,

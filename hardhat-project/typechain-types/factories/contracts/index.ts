@@ -2,3 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export { MockPYUSD__factory } from "./MockPYUSD__factory";
+export { MusicNFT__factory } from "./MusicNFT__factory";
+export { MusicNFTV2__factory } from "./MusicNFTV2__factory";
+export { PYUSDC__factory } from "./PYUSDC__factory";
+export { TestPYUSD__factory } from "./TestPYUSD__factory";

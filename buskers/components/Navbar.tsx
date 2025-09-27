@@ -1,10 +1,8 @@
 'use client';
 
-import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { useAccount } from 'wagmi';
+import { WalletConnect } from './WalletConnect';
 
 export function Navbar() {
-  const { isConnected, address } = useAccount();
 
   return (
     <nav className="bg-white shadow-lg border-b border-gray-200">
@@ -37,17 +35,7 @@ export function Navbar() {
 
           {/* Wallet Connect Button */}
           <div className="flex items-center">
-            <ConnectButton
-              chainStatus="icon"
-              accountStatus={{
-                smallScreen: 'avatar',
-                largeScreen: 'full',
-              }}
-              showBalance={{
-                smallScreen: false,
-                largeScreen: true,
-              }}
-            />
+            <WalletConnect />
           </div>
 
           {/* Mobile menu button */}

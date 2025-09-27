@@ -17,7 +17,13 @@ export function WalletProvider({ children }: WalletProviderProps) {
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider>
+        <RainbowKitProvider
+          modalSize="compact"
+          showRecentTransactions={false}
+          appInfo={{
+            appName: 'Buskers',
+          }}
+        >
           {children}
         </RainbowKitProvider>
       </QueryClientProvider>

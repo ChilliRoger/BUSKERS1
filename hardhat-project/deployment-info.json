@@ -1,0 +1,12 @@
+{
+  "contractName": "MusicNFT",
+  "contractAddress": "0xCF9C0C4c9E7C0b2BEAFc0Be2182115F2d386B313",
+  "tokenName": "Buskers Music NFT",
+  "tokenSymbol": "BMNFT",
+  "baseTokenURI": "https://api.buskers.com/metadata/",
+  "deployer": "0x12D63742591E497C813C4Ac33BE27cC913Bd201d",
+  "network": "kadenaTestnet",
+  "chainId": "5920",
+  "deploymentTime": "2025-09-27T09:56:49.741Z",
+  "transactionHash": "0xe8377e9f138f80d99ebeb54582aaddc405eb8346786d7a3aad2fec8dc468db16"
+}

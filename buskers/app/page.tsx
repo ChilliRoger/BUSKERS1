@@ -2,9 +2,38 @@
 
 import { useAccount } from 'wagmi';
 import { ArtistUpload } from '@/components/ArtistUpload';
+import { FanPurchase } from '@/components/FanPurchase';
+import { useState } from 'react';
 
 export default function Home() {
   const { isConnected, address } = useAccount();
+  const [showDiagnostics, setShowDiagnostics] = useState(false);
+
+  const testEnvironment = () => {
+    console.log('🔍 ENVIRONMENT DIAGNOSTICS:');
+    console.log('================================');
+    
+    // Log all environment variables (mask private keys)
+    const envVars = Object.keys(process.env).filter(key => key.startsWith('NEXT_PUBLIC_') || key.includes('KADENA') || key.includes('TUSKY'));
+    
+    envVars.forEach(key => {
+      const value = process.env[key];
+      if (key.toLowerCase().includes('key') || key.toLowerCase().includes('secret')) {
+        console.log(`${key}:`, value ? `${value.slice(0, 8)}...` : 'undefined');
+      } else {
+        console.log(`${key}:`, value || 'undefined');
+      }
+    });
+    
+    console.log('================================');
+    console.log('Wallet Status:');
+    console.log('Connected:', isConnected);
+    console.log('Address:', address || 'Not connected');
+    console.log('================================');
+    
+    setShowDiagnostics(true);
+    setTimeout(() => setShowDiagnostics(false), 3000);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -23,6 +52,23 @@ export default function Home() {
                 <p className="text-sm">Connected: {address?.slice(0, 6)}...{address?.slice(-4)}</p>
               </div>
             )}
+            
+            {/* Test Environment Button */}
+            <div className="mt-4">
+              <button
+                onClick={testEnvironment}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  showDiagnostics
+                    ? 'bg-green-600 text-white'
+                    : 'bg-white/20 text-white hover:bg-white/30'
+                }`}
+              >
+                {showDiagnostics ? '✅ Environment Tested' : '🔍 Test Env'}
+              </button>
+              <p className="text-xs text-purple-200 mt-2">
+                Check console for diagnostics
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -36,57 +82,8 @@ export default function Home() {
           </div>
 
           {/* Fan Purchase Section */}
-          <div id="fan" className="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow">
-            <div className="text-center mb-6">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                </svg>
-              </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Fan Purchase</h2>
-              <p className="text-gray-600">Discover and support your favorite artists</p>
-            </div>
-            
-            <div className="space-y-4">
-              <div className="bg-gray-50 rounded-lg p-6">
-                <h3 className="font-semibold text-gray-900 mb-2">Featured Tracks</h3>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 bg-white rounded-lg border">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-gradient-to-r from-purple-400 to-blue-400 rounded-full"></div>
-                      <div>
-                        <p className="font-medium text-sm">Amazing Song</p>
-                        <p className="text-xs text-gray-500">by Artist Name</p>
-                      </div>
-                    </div>
-                    <button className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition-colors">
-                      Buy
-                    </button>
-                  </div>
-                  <div className="flex items-center justify-between p-3 bg-white rounded-lg border">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-gradient-to-r from-green-400 to-yellow-400 rounded-full"></div>
-                      <div>
-                        <p className="font-medium text-sm">Cool Beat</p>
-                        <p className="text-xs text-gray-500">by Another Artist</p>
-                      </div>
-                    </div>
-                    <button className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition-colors">
-                      Buy
-                    </button>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <button className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
-                  Browse Music
-                </button>
-                <button className="bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors">
-                  My Library
-                </button>
-              </div>
-            </div>
+          <div id="fan">
+            <FanPurchase />
           </div>
         </div>
 

@@ -2,3 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export type { MockPYUSD } from "./MockPYUSD";
+export type { MusicNFT } from "./MusicNFT";
+export type { MusicNFTV2 } from "./MusicNFTV2";
+export type { PYUSDC } from "./PYUSDC";
+export type { TestPYUSD } from "./TestPYUSD";

@@ -94,6 +94,18 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.MusicNFTV2__factory>;
     getContractFactory(
+      name: "MusicNFTV3",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.MusicNFTV3__factory>;
+    getContractFactory(
+      name: "MusicNFTV4",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.MusicNFTV4__factory>;
+    getContractFactory(
+      name: "MusicNFTV5",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.MusicNFTV5__factory>;
+    getContractFactory(
       name: "PYUSDC",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.PYUSDC__factory>;
@@ -203,6 +215,21 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.MusicNFTV2>;
     getContractAt(
+      name: "MusicNFTV3",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.MusicNFTV3>;
+    getContractAt(
+      name: "MusicNFTV4",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.MusicNFTV4>;
+    getContractAt(
+      name: "MusicNFTV5",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.MusicNFTV5>;
+    getContractAt(
       name: "PYUSDC",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
@@ -294,6 +321,18 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.MusicNFTV2>;
     deployContract(
+      name: "MusicNFTV3",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.MusicNFTV3>;
+    deployContract(
+      name: "MusicNFTV4",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.MusicNFTV4>;
+    deployContract(
+      name: "MusicNFTV5",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.MusicNFTV5>;
+    deployContract(
       name: "PYUSDC",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.PYUSDC>;
@@ -402,6 +441,21 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.MusicNFTV2>;
+    deployContract(
+      name: "MusicNFTV3",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.MusicNFTV3>;
+    deployContract(
+      name: "MusicNFTV4",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.MusicNFTV4>;
+    deployContract(
+      name: "MusicNFTV5",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.MusicNFTV5>;
     deployContract(
       name: "PYUSDC",
       args: any[],

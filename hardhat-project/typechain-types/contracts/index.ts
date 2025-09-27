@@ -4,5 +4,8 @@
 export type { MockPYUSD } from "./MockPYUSD";
 export type { MusicNFT } from "./MusicNFT";
 export type { MusicNFTV2 } from "./MusicNFTV2";
+export type { MusicNFTV3 } from "./MusicNFTV3";
+export type { MusicNFTV4 } from "./MusicNFTV4";
+export type { MusicNFTV5 } from "./MusicNFTV5";
 export type { PYUSDC } from "./PYUSDC";
 export type { TestPYUSD } from "./TestPYUSD";

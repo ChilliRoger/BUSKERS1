@@ -1037,6 +1037,124 @@
       "artifacts": [
         "TestPYUSD"
       ]
+    },
+    "E:\\BUSKERS1\\hardhat-project\\contracts\\MusicNFTV3.sol": {
+      "lastModificationDate": 1758997873037,
+      "contentHash": "8c977e973f571f97ad988492e5019215",
+      "sourceName": "contracts/MusicNFTV3.sol",
+      "solcConfig": {
+        "version": "0.8.24",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC721/ERC721.sol",
+        "@openzeppelin/contracts/access/Ownable.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.19"
+      ],
+      "artifacts": [
+        "MusicNFTV3"
+      ]
+    },
+    "E:\\BUSKERS1\\hardhat-project\\contracts\\MusicNFTV4.sol": {
+      "lastModificationDate": 1758998117954,
+      "contentHash": "a6d02b22285176da650848f4b01bb31b",
+      "sourceName": "contracts/MusicNFTV4.sol",
+      "solcConfig": {
+        "version": "0.8.24",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC721/ERC721.sol",
+        "@openzeppelin/contracts/access/Ownable.sol",
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.19"
+      ],
+      "artifacts": [
+        "MusicNFTV4"
+      ]
+    },
+    "E:\\BUSKERS1\\hardhat-project\\contracts\\MusicNFTV5.sol": {
+      "lastModificationDate": 1758998783169,
+      "contentHash": "5f984fd39bc1e5292d1d98b94aef7053",
+      "sourceName": "contracts/MusicNFTV5.sol",
+      "solcConfig": {
+        "version": "0.8.24",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC721/ERC721.sol",
+        "@openzeppelin/contracts/access/Ownable.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.19"
+      ],
+      "artifacts": [
+        "MusicNFTV5"
+      ]
     }
   }
 }

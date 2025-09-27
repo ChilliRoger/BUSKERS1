@@ -208,24 +208,40 @@ export function FanPurchase() {
     }));
 
     try {
-      console.log('🚰 Getting TestPYUSD from faucet...');
+      console.log('🚰 MOCK FAUCET - Getting TestPYUSD...');
       console.log('PYUSD contract address:', getPYUSDContract().address);
       console.log('Amount: 1000 tPYUSD');
       
-      // Try to call the faucet function on the contract
-      writeContract({
-        address: getPYUSDContract().address,
-        abi: getPYUSDContract().abi,
-        functionName: 'faucet',
-        args: [ethers.parseUnits("1000", 6)], // 1000 tPYUSD
-      });
-
-      console.log('✅ Faucet transaction initiated');
-
+      // Mock faucet - simulate getting tokens
+      console.log('✅ Mock faucet - simulating token distribution');
+      
       toast.loading('Getting 1000 tPYUSD from faucet...', {
         duration: 2000,
         position: 'top-right',
       });
+
+      // Simulate faucet delay
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      setFaucetState(prev => ({
+        ...prev,
+        isFauceting: false,
+        faucetError: null,
+      }));
+      
+      toast.success(
+        <div>
+          <p className="font-medium">Successfully got 1000 tPYUSD!</p>
+          <p className="text-sm text-gray-600">Note: This is a mock faucet for testing</p>
+        </div>,
+        {
+          duration: 5000,
+          position: 'top-right',
+        }
+      );
+      
+      // Refetch balance to show updated amount
+      refetchBalance();
 
     } catch (error) {
       console.error('❌ Faucet error:', error);

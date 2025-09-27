@@ -1,13 +1,13 @@
-import { ethers } from "hardhat";
+import { ethers } from "ethers";
+import hre from "hardhat";
 
 async function main() {
   console.log("🌐 Testing Kadena EVM Testnet connection...\n");
 
   try {
     console.log("🚀 Attempting deployment to Kadena EVM Testnet...");
-    
     // Get the deployer account
-    const [deployer] = await ethers.getSigners();
+    const [deployer] = await hre.ethers.getSigners();
     console.log("Deploying contracts with the account:", deployer.address);
     console.log("Account balance:", ethers.formatEther(await deployer.provider.getBalance(deployer.address)), "ETH");
     console.log("Network:", await deployer.provider.getNetwork());

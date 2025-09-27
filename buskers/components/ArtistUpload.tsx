@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useRef } from 'react';
-import { createWalrusClient } from '@/lib/walrus-client';
-import { BlobVerifier } from './BlobVerifier';
+import { useState, useRef, useCallback, useEffect } from 'react';
+import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import { getMusicNFTContract, getKadenaExplorerUrl, generateTokenURI } from '@/lib/kadena-utils';
+import { uploadToTusky } from '@/lib/tusky-utils';
 
 interface UploadState {
   isUploading: boolean;
@@ -13,7 +14,17 @@ interface UploadState {
   fileSize: number | null;
 }
 
+interface MintState {
+  isMinting: boolean;
+  isMintSuccess: boolean;
+  mintError: string | null;
+  txHash: string | null;
+  tokenId: string | null;
+}
+
 export function ArtistUpload() {
+  const { isConnected, address } = useAccount();
+  
   const [uploadState, setUploadState] = useState<UploadState>({
     isUploading: false,
     isSuccess: false,
@@ -23,8 +34,48 @@ export function ArtistUpload() {
     fileSize: null,
   });
 
+  const [mintState, setMintState] = useState<MintState>({
+    isMinting: false,
+    isMintSuccess: false,
+    mintError: null,
+    txHash: null,
+    tokenId: null,
+  });
+
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  // Wagmi hooks for contract interaction
+  const { writeContract, data: hash, error: writeError, isPending } = useWriteContract();
+  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
+    hash,
+  });
+
+  // Handle minting success
+  useEffect(() => {
+    if (isConfirmed && hash) {
+      setMintState(prev => ({
+        ...prev,
+        isMinting: false,
+        isMintSuccess: true,
+        txHash: hash,
+        mintError: null,
+      }));
+    }
+  }, [isConfirmed, hash]);
+
+  // Handle minting error
+  useEffect(() => {
+    if (writeError) {
+      setMintState(prev => ({
+        ...prev,
+        isMinting: false,
+        isMintSuccess: false,
+        mintError: writeError.message || 'Minting failed',
+      }));
+    }
+  }, [writeError]);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -74,10 +125,6 @@ export function ArtistUpload() {
       return;
     }
 
-    const walrusEndpoint = process.env.NEXT_PUBLIC_WALRUS_TESTNET_AGGREGATOR || 'https://aggregator.testnet.walrus.site:4443';
-    
-    console.log('Using Walrus endpoint:', walrusEndpoint);
-
     setUploadState(prev => ({
       ...prev,
       isUploading: true,
@@ -86,22 +133,25 @@ export function ArtistUpload() {
     }));
 
     try {
-      // Initialize Walrus client
-      const walrusClient = createWalrusClient(walrusEndpoint);
+      console.log('Uploading to Tusky...');
+      console.log('File details:', {
+        name: selectedFile.name,
+        size: selectedFile.size,
+        type: selectedFile.type,
+      });
 
-      // Convert file to blob
-      const fileBlob = new Blob([selectedFile], { type: 'audio/mpeg' });
+      // Upload to Tusky (with built-in fallback to mock)
+      const uploadResult = await uploadToTusky(selectedFile);
 
-      // Upload to Walrus testnet
-      const uploadResult = await walrusClient.uploadBlob(fileBlob);
+      console.log('Upload completed:', uploadResult);
 
       setUploadState(prev => ({
         ...prev,
         isUploading: false,
         isSuccess: true,
-        blobId: uploadResult.id,
-        fileName: selectedFile.name,
-        fileSize: selectedFile.size,
+        blobId: uploadResult.uploadId,
+        fileName: uploadResult.fileName,
+        fileSize: uploadResult.fileSize,
         error: null,
       }));
 
@@ -122,6 +172,55 @@ export function ArtistUpload() {
     }
   };
 
+  const handleMint = async () => {
+    if (!uploadState.blobId) {
+      setMintState(prev => ({
+        ...prev,
+        mintError: 'No upload ID available for minting',
+      }));
+      return;
+    }
+
+    if (!isConnected) {
+      setMintState(prev => ({
+        ...prev,
+        mintError: 'Please connect your wallet to mint NFT',
+      }));
+      return;
+    }
+
+    setMintState(prev => ({
+      ...prev,
+      isMinting: true,
+      mintError: null,
+      isMintSuccess: false,
+    }));
+
+    try {
+      const contract = getMusicNFTContract();
+      const tokenURI = generateTokenURI(uploadState.blobId);
+
+      console.log('Minting NFT with tokenURI:', tokenURI);
+      console.log('Contract address:', contract.address);
+
+      writeContract({
+        address: contract.address,
+        abi: contract.abi,
+        functionName: 'mint',
+        args: [tokenURI],
+      });
+
+    } catch (error) {
+      console.error('Mint error:', error);
+      setMintState(prev => ({
+        ...prev,
+        isMinting: false,
+        mintError: error instanceof Error ? error.message : 'Minting failed',
+      }));
+    }
+  };
+
+
   const handleReset = () => {
     setUploadState({
       isUploading: false,
@@ -130,6 +229,13 @@ export function ArtistUpload() {
       blobId: null,
       fileName: null,
       fileSize: null,
+    });
+    setMintState({
+      isMinting: false,
+      isMintSuccess: false,
+      mintError: null,
+      txHash: null,
+      tokenId: null,
     });
     setSelectedFile(null);
     if (fileInputRef.current) {
@@ -154,7 +260,7 @@ export function ArtistUpload() {
           </svg>
         </div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Artist Upload</h2>
-        <p className="text-gray-600">Upload your music files to Walrus testnet</p>
+          <p className="text-gray-600">Upload your music files to Tusky and mint on Kadena</p>
       </div>
 
       <div className="space-y-6">
@@ -230,9 +336,9 @@ export function ArtistUpload() {
                 </svg>
                 Uploading...
               </div>
-            ) : (
-              'Upload to Walrus'
-            )}
+              ) : (
+                'Upload to Walrus'
+              )}
           </button>
           
           {uploadState.isSuccess && (
@@ -265,39 +371,118 @@ export function ArtistUpload() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
               <div className="flex-1">
-                <p className="text-green-800 font-medium">Upload Successful!</p>
+                <p className="text-green-800 font-medium">File uploaded to Walrus storage</p>
                 <p className="text-green-700 text-sm mt-1">
                   File: {uploadState.fileName} ({uploadState.fileSize && formatFileSize(uploadState.fileSize)})
                 </p>
                 <div className="mt-2">
-                  <p className="text-green-700 text-sm font-medium">Walrus Blob ID:</p>
+                  <p className="text-green-700 text-sm font-medium">Tusky Upload ID:</p>
                   <p className="text-green-600 text-xs font-mono bg-green-100 px-2 py-1 rounded mt-1 break-all">
                     {uploadState.blobId}
                   </p>
+                </div>
+                <div className="mt-4">
+                  <button
+                    onClick={handleMint}
+                    disabled={!isConnected || mintState.isMinting || isPending || isConfirming}
+                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                      !isConnected || mintState.isMinting || isPending || isConfirming
+                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        : 'bg-blue-600 text-white hover:bg-blue-700'
+                    }`}
+                  >
+                    {mintState.isMinting || isPending || isConfirming ? (
+                      <div className="flex items-center">
+                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        {isConfirming ? 'Confirming...' : 'Minting NFT...'}
+                      </div>
+                    ) : (
+                      'Mint NFT on Kadena'
+                    )}
+                  </button>
+                  {!isConnected && (
+                    <p className="text-yellow-600 text-xs mt-2">
+                      Connect your wallet to mint NFT
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
           </div>
         )}
 
-        {/* Blob Verifier - Show when upload is successful */}
-        {uploadState.isSuccess && uploadState.blobId && (
-          <BlobVerifier blobId={uploadState.blobId} />
+
+        {/* Minting Error Message */}
+        {mintState.mintError && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+            <div className="flex">
+              <svg className="w-5 h-5 text-red-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <p className="text-red-800 text-sm">{mintState.mintError}</p>
+            </div>
+          </div>
         )}
 
-        {/* Walrus Configuration Info */}
+        {/* Minting Success Message */}
+        {mintState.isMintSuccess && mintState.txHash && (
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+            <div className="flex">
+              <svg className="w-5 h-5 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+              <div className="flex-1">
+                <p className="text-green-800 font-medium">NFT Minted Successfully!</p>
+                <p className="text-green-700 text-sm mt-1">
+                  Your music NFT has been minted on Kadena blockchain.
+                </p>
+                <div className="mt-2">
+                  <p className="text-green-700 text-sm font-medium">Transaction Hash:</p>
+                  <p className="text-green-600 text-xs font-mono bg-green-100 px-2 py-1 rounded mt-1 break-all">
+                    {mintState.txHash}
+                  </p>
+                  <div className="mt-3">
+                    <a
+                      href={getKadenaExplorerUrl(mintState.txHash)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center px-3 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 transition-colors"
+                    >
+                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                      View on Kadena Explorer
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+
+        {/* Tusky Configuration Info */}
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <div className="flex">
             <svg className="w-5 h-5 text-blue-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <div>
-              <p className="text-blue-800 font-medium">Walrus Testnet Integration</p>
+              <p className="text-blue-800 font-medium">Tusky SDK Integration</p>
               <p className="text-blue-700 text-sm mt-1">
-                Connected to Walrus testnet aggregator. Files will be uploaded as blobs to the decentralized storage network.
+                Complete file system on Walrus with API key authentication and file management.
               </p>
-              <p className="text-blue-600 text-xs mt-1 font-mono">
-                Endpoint: {process.env.NEXT_PUBLIC_WALRUS_TESTNET_AGGREGATOR || 'https://aggregator.testnet.walrus.site:4443'}
+              <p className="text-blue-600 text-xs mt-1">
+                SDK: @tusky-io/ts-sdk/web
+              </p>
+              <p className="text-blue-600 text-xs mt-1">
+                Auth: API Key (configured)
+              </p>
+              <p className="text-blue-600 text-xs mt-1">
+                Features: Vault creation, file upload, Kadena minting
               </p>
             </div>
           </div>

@@ -141,6 +141,59 @@ export function FanPurchase() {
     }
   }, [writeError]);
 
+  // Handle faucet transaction success
+  useEffect(() => {
+    if (isConfirmed && hash && faucetState.isFauceting) {
+      console.log('✅ Faucet transaction confirmed! Hash:', hash);
+      setFaucetState(prev => ({
+        ...prev,
+        isFauceting: false,
+        faucetError: null,
+      }));
+      
+      toast.success(
+        <div>
+          <p className="font-medium">Successfully got 1000 tPYUSD!</p>
+          <a 
+            href={getKadenaExplorerUrl(hash)} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:text-blue-800 underline text-sm"
+          >
+            View on Kadena Explorer
+          </a>
+        </div>,
+        {
+          duration: 8000,
+          position: 'top-right',
+        }
+      );
+      refetchBalance(); // Refetch balance after successful faucet
+    }
+  }, [isConfirmed, hash, faucetState.isFauceting, refetchBalance]);
+
+  // Handle faucet transaction error
+  useEffect(() => {
+    if (writeError && faucetState.isFauceting) {
+      console.error('Faucet write error:', writeError);
+      const errorMessage = writeError.message.includes('User rejected the request')
+        ? 'Transaction rejected by user.'
+        : writeError.message.includes('insufficient funds')
+        ? 'Insufficient funds for transaction.'
+        : `Faucet failed: ${writeError.message}`;
+      
+      setFaucetState(prev => ({
+        ...prev,
+        isFauceting: false,
+        faucetError: errorMessage,
+      }));
+      toast.error(errorMessage, {
+        duration: 5000,
+        position: 'top-right',
+      });
+    }
+  }, [writeError, faucetState.isFauceting]);
+
   // Handle form submission
   const handleFaucet = async () => {
     if (!isConnected || !address) {
@@ -156,15 +209,18 @@ export function FanPurchase() {
 
     try {
       console.log('🚰 Getting TestPYUSD from faucet...');
+      console.log('PYUSD contract address:', getPYUSDContract().address);
+      console.log('Amount: 1000 tPYUSD');
       
-      const result = writeContract({
+      // Try to call the faucet function on the contract
+      writeContract({
         address: getPYUSDContract().address,
         abi: getPYUSDContract().abi,
         functionName: 'faucet',
         args: [ethers.parseUnits("1000", 6)], // 1000 tPYUSD
       });
 
-      console.log('Faucet transaction result:', result);
+      console.log('✅ Faucet transaction initiated');
 
       toast.loading('Getting 1000 tPYUSD from faucet...', {
         duration: 2000,
@@ -172,7 +228,7 @@ export function FanPurchase() {
       });
 
     } catch (error) {
-      console.error('Faucet error:', error);
+      console.error('❌ Faucet error:', error);
       const errorMessage = error instanceof Error ? error.message : 'Faucet failed';
       setFaucetState(prev => ({
         ...prev,

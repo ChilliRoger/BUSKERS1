@@ -54,10 +54,10 @@ contract MusicNFTV2 is ERC721, ERC721URIStorage, Ownable {
         require(to != address(0), "MusicNFT: cannot mint to zero address");
         require(bytes(tokenUriString).length > 0, "MusicNFT: tokenURI cannot be empty");
         
-        // Validate that the tokenURI follows the expected format for Walrus/Tusky
+        // Validate that the tokenURI follows a valid format
         require(
             _isValidWalrusURI(tokenUriString), 
-            "MusicNFT: tokenURI must be a valid Walrus/Tusky URI (tusky-walrus://...)"
+            "MusicNFT: tokenURI must be a valid URI (tusky-walrus://... or data:...)"
         );
         
         // Check PYUSD balance and allowance
@@ -79,23 +79,37 @@ contract MusicNFTV2 is ERC721, ERC721URIStorage, Ownable {
     }
     
     /**
-     * @dev Validate that the tokenURI follows the expected Walrus/Tusky format
+     * @dev Validate that the tokenURI follows a valid format (tusky-walrus:// or data:)
      * @param tokenUriString The token URI to validate
      * @return True if the URI is valid
      */
     function _isValidWalrusURI(string memory tokenUriString) internal pure returns (bool) {
         bytes memory uriBytes = bytes(tokenUriString);
-        if (uriBytes.length < 15) return false; // Minimum length for "tusky-walrus://"
+        if (uriBytes.length < 5) return false; // Minimum length for "data:"
         
-        // Check if it starts with "tusky-walrus://"
-        bytes memory prefix = "tusky-walrus://";
-        if (uriBytes.length < prefix.length) return false;
-        
-        for (uint i = 0; i < prefix.length; i++) {
-            if (uriBytes[i] != prefix[i]) return false;
+        // Check if it starts with "tusky-walrus://" (for Walrus/Tusky storage)
+        if (uriBytes.length >= 15) {
+            bytes memory tuskyPrefix = "tusky-walrus://";
+            bool isTusky = true;
+            for (uint i = 0; i < tuskyPrefix.length; i++) {
+                if (uriBytes[i] != tuskyPrefix[i]) {
+                    isTusky = false;
+                    break;
+                }
+            }
+            if (isTusky) return true;
         }
         
-        return true;
+        // Check if it starts with "data:" (for inline metadata)
+        if (uriBytes.length >= 5) {
+            bytes memory dataPrefix = "data:";
+            for (uint i = 0; i < dataPrefix.length; i++) {
+                if (uriBytes[i] != dataPrefix[i]) return false;
+            }
+            return true;
+        }
+        
+        return false;
     }
     
     /**

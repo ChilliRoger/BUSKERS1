@@ -920,8 +920,8 @@
       ]
     },
     "E:\\BUSKERS1\\hardhat-project\\contracts\\MusicNFTV2.sol": {
-      "lastModificationDate": 1758989194479,
-      "contentHash": "074ca024ec547cdb864fe6f4113f91e2",
+      "lastModificationDate": 1758993728169,
+      "contentHash": "7c041aaaaae8d57afbc081e536f046d9",
       "sourceName": "contracts/MusicNFTV2.sol",
       "solcConfig": {
         "version": "0.8.24",

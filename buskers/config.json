@@ -3,7 +3,7 @@
     "testnetRpc": "https://evm-testnet.chainweb.com/chainweb/0.0/evm-testnet/chain/20/evm/rpc",
     "chainId": 5920,
     "explorerBaseUrl": "https://explorer.chainweb.com/testnet/tx",
-    "contractAddress": "0x4a98E109082C2ca61bfA83b20CffDfe3CefbB5b3",
+    "contractAddress": "0xBE4C36DB0348a5a327836eD9Ef4720096BAAA8DF",
     "pyusdAddress": "0x0aD75db1a6C8B5B6d5F0398F6bd724dd0fb920AF",
     "mockPYUSDAddress": "0x45fD5d31E2D015d5E97CD1D9cd94B0bcE354A867"
   },

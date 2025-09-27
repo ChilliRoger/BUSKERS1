@@ -31,6 +31,23 @@ export default function Home() {
     console.log('Address:', address || 'Not connected');
     console.log('================================');
     
+    // Test contract configuration
+    try {
+      const { getMusicNFTContract, getPYUSDContract } = require('@/lib/kadena-utils');
+      const musicNFT = getMusicNFTContract();
+      const pyusd = getPYUSDContract();
+      
+      console.log('================================');
+      console.log('CONTRACT CONFIGURATION:');
+      console.log('MusicNFT Address:', musicNFT.address);
+      console.log('PYUSD Address:', pyusd.address);
+      console.log('MusicNFT ABI functions:', Object.keys(musicNFT.abi));
+      console.log('PYUSD ABI functions:', Object.keys(pyusd.abi));
+      console.log('================================');
+    } catch (error) {
+      console.error('❌ Contract configuration error:', error);
+    }
+    
     setShowDiagnostics(true);
     setTimeout(() => setShowDiagnostics(false), 3000);
   };

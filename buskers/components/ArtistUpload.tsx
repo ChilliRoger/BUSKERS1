@@ -80,6 +80,7 @@ export function ArtistUpload() {
     faucetError: null as string | null,
   });
 
+
   // Handle minting success
   useEffect(() => {
     if (isConfirmed && hash) {
@@ -132,6 +133,59 @@ export function ArtistUpload() {
       });
     }
   }, [writeError]);
+
+  // Handle faucet transaction success
+  useEffect(() => {
+    if (isConfirmed && hash && faucetState.isFauceting) {
+      console.log('✅ Faucet transaction confirmed! Hash:', hash);
+      setFaucetState(prev => ({
+        ...prev,
+        isFauceting: false,
+        faucetError: null,
+      }));
+      
+      toast.success(
+        <div>
+          <p className="font-medium">Successfully got 1000 tPYUSD!</p>
+          <a 
+            href={getKadenaExplorerUrl(hash)} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:text-blue-800 underline text-sm"
+          >
+            View on Kadena Explorer
+          </a>
+        </div>,
+        {
+          duration: 8000,
+          position: 'top-right',
+        }
+      );
+      refetchPyusdBalance(); // Refetch balance after successful faucet
+    }
+  }, [isConfirmed, hash, faucetState.isFauceting, refetchPyusdBalance]);
+
+  // Handle faucet transaction error
+  useEffect(() => {
+    if (writeError && faucetState.isFauceting) {
+      console.error('Faucet write error:', writeError);
+      const errorMessage = writeError.message.includes('User rejected the request')
+        ? 'Transaction rejected by user.'
+        : writeError.message.includes('insufficient funds')
+        ? 'Insufficient funds for transaction.'
+        : `Faucet failed: ${writeError.message}`;
+      
+      setFaucetState(prev => ({
+        ...prev,
+        isFauceting: false,
+        faucetError: errorMessage,
+      }));
+      toast.error(errorMessage, {
+        duration: 5000,
+        position: 'top-right',
+      });
+    }
+  }, [writeError, faucetState.isFauceting]);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -333,15 +387,18 @@ export function ArtistUpload() {
 
     try {
       console.log('🚰 Getting TestPYUSD from faucet...');
+      console.log('PYUSD contract address:', getPYUSDContract().address);
+      console.log('Amount: 1000 tPYUSD');
       
-      const result = writeContract({
+      // Try to call the faucet function on the contract
+      writeContract({
         address: getPYUSDContract().address,
         abi: getPYUSDContract().abi,
         functionName: 'faucet',
         args: [ethers.parseUnits("1000", 6)], // 1000 tPYUSD
       });
 
-      console.log('Faucet transaction result:', result);
+      console.log('✅ Faucet transaction initiated');
 
       toast.loading('Getting 1000 tPYUSD from faucet...', {
         duration: 2000,
@@ -349,7 +406,7 @@ export function ArtistUpload() {
       });
 
     } catch (error) {
-      console.error('Faucet error:', error);
+      console.error('❌ Faucet error:', error);
       const errorMessage = error instanceof Error ? error.message : 'Faucet failed';
       setFaucetState(prev => ({
         ...prev,
@@ -360,13 +417,23 @@ export function ArtistUpload() {
     }
   };
 
+
   const handleMint = async () => {
     console.log('🔍 MINT DIAGNOSTICS - Starting mint process...');
+    console.log('=== COMPLETE MINTING DEBUG ===');
+    console.log('Wallet connected:', isConnected);
+    console.log('Wallet address:', address);
+    console.log('Chain ID:', chainId);
+    console.log('Music upload ID:', uploadState.blobId);
+    console.log('Album cover upload ID:', uploadState.albumCoverBlobId);
+    console.log('PYUSD balance:', pyusdBalance ? parsePYUSDAmount(pyusdBalance.toString()) : 'Not loaded');
+    
+    
+    console.log('=============================');
     
     // Pre-mint validation with alerts
     if (!isConnected) {
       const errorMsg = 'Wallet not connected';
-      alert(errorMsg);
       console.error('❌ MINT FAILED:', errorMsg);
       setMintState(prev => ({
         ...prev,
@@ -378,7 +445,6 @@ export function ArtistUpload() {
 
     if (!address) {
       const errorMsg = 'Wallet address not available';
-      alert(errorMsg);
       console.error('❌ MINT FAILED:', errorMsg);
       setMintState(prev => ({
         ...prev,
@@ -390,7 +456,6 @@ export function ArtistUpload() {
 
     if (!uploadState.blobId) {
       const errorMsg = 'Upload first - No music file upload ID available';
-      alert(errorMsg);
       console.error('❌ MINT FAILED:', errorMsg);
       setMintState(prev => ({
         ...prev,
@@ -402,7 +467,6 @@ export function ArtistUpload() {
 
     if (!uploadState.albumCoverBlobId) {
       const errorMsg = 'Upload first - No album cover upload ID available';
-      alert(errorMsg);
       console.error('❌ MINT FAILED:', errorMsg);
       setMintState(prev => ({
         ...prev,
@@ -413,10 +477,6 @@ export function ArtistUpload() {
     }
 
     console.log('✅ Pre-mint checks passed');
-    console.log('Wallet connected:', isConnected);
-    console.log('Wallet address:', address);
-    console.log('Music upload ID:', uploadState.blobId);
-    console.log('Album cover upload ID:', uploadState.albumCoverBlobId);
 
     // Check if we're on the right network and switch automatically
     const expectedChainId = Number(process.env.NEXT_PUBLIC_KADENA_CHAIN_ID) || 5920;
@@ -456,24 +516,36 @@ export function ArtistUpload() {
       isMintSuccess: false,
     }));
 
-    try {
-      const contract = getMusicNFTContract();
-      const pyusdContract = getPYUSDContract();
-      
-      // Check PYUSD balance
-      const currentBalance = pyusdBalance ? parsePYUSDAmount(pyusdBalance.toString()) : 0;
-      const mintPrice = 10; // 10 PYUSD mint price
-      
-      if (currentBalance < mintPrice) {
-        const errorMsg = `Insufficient PYUSD balance. You have ${currentBalance.toFixed(2)} PYUSD, need ${mintPrice} PYUSD`;
-        setMintState(prev => ({
-          ...prev,
-          isMinting: false,
-          mintError: errorMsg,
-        }));
-        toast.error(errorMsg);
-        return;
-      }
+        try {
+          const contract = getMusicNFTContract();
+          const pyusdContract = getPYUSDContract();
+          
+          console.log('🔍 CONTRACT DEBUG INFO:');
+          console.log('MusicNFT contract address:', contract.address);
+          console.log('PYUSD contract address:', pyusdContract.address);
+          console.log('Contract ABI functions:', Object.keys(contract.abi));
+          console.log('PYUSD ABI functions:', Object.keys(pyusdContract.abi));
+          
+          // Check PYUSD balance
+          const currentBalance = pyusdBalance ? parsePYUSDAmount(pyusdBalance.toString()) : 0;
+          const mintPrice = 10; // 10 tPYUSD mint price
+          
+          console.log('💰 BALANCE CHECK:');
+          console.log('Current balance:', currentBalance, 'tPYUSD');
+          console.log('Mint price:', mintPrice, 'tPYUSD');
+          console.log('Sufficient balance:', currentBalance >= mintPrice);
+          
+          if (currentBalance < mintPrice) {
+            const errorMsg = `Insufficient PYUSD balance. You have ${currentBalance.toFixed(2)} tPYUSD, need ${mintPrice} tPYUSD`;
+            console.error('❌ INSUFFICIENT BALANCE:', errorMsg);
+            setMintState(prev => ({
+              ...prev,
+              isMinting: false,
+              mintError: errorMsg,
+            }));
+            toast.error(errorMsg);
+            return;
+          }
 
       // Create simple metadata with album cover as NFT image and audio file linked
       const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
@@ -510,33 +582,44 @@ export function ArtistUpload() {
       const metadataJson = JSON.stringify(metadata);
       const metadataURI = `data:application/json;base64,${Buffer.from(metadataJson).toString('base64')}`;
 
-      console.log('🔍 MINTING WITH PYUSD PAYMENT');
-      console.log('=== DYNAMIC MINTING DEBUG ===');
-      console.log('Contract address:', contract.address);
-      console.log('PYUSD address:', pyusdContract.address);
-      console.log('Minting to address:', address);
-      console.log('PYUSD balance:', currentBalance, 'PYUSD');
-      console.log('Mint price:', mintPrice, 'PYUSD');
-      console.log('Metadata URI length:', metadataURI.length);
-      console.log('=============================');
+          console.log('🔍 MINTING WITH PYUSD PAYMENT');
+          console.log('=== DYNAMIC MINTING DEBUG ===');
+          console.log('Contract address:', contract.address);
+          console.log('PYUSD address:', pyusdContract.address);
+          console.log('Minting to address:', address);
+          console.log('PYUSD balance:', currentBalance, 'tPYUSD');
+          console.log('Mint price:', mintPrice, 'tPYUSD');
+          console.log('Metadata URI length:', metadataURI.length);
+          console.log('Metadata preview:', metadataURI.substring(0, 100) + '...');
+          console.log('=============================');
 
-      // Use writeContract with PYUSD payment
-      const result = writeContract({
-        address: contract.address,
-        abi: contract.abi,
-        functionName: 'mint',
-        args: [address, metadataURI],
-      });
+          console.log('🚀 Calling writeContract...');
+          console.log('Function: mint');
+          console.log('Args:', [address, metadataURI]);
 
-      console.log('Write contract result:', result);
+          // Use writeContract with PYUSD payment
+          const result = writeContract({
+            address: contract.address,
+            abi: contract.abi,
+            functionName: 'mint',
+            args: [address, metadataURI],
+          });
 
-      toast.loading('Minting NFT with PYUSD payment...', {
-        duration: 2000,
-        position: 'top-right',
-      });
+          console.log('✅ Write contract call initiated:', result);
+
+          toast.loading('Minting NFT with tPYUSD payment...', {
+            duration: 2000,
+            position: 'top-right',
+          });
 
     } catch (error) {
-      console.error('Mint error:', error);
+      console.error('❌ MINT ERROR:', error);
+      console.error('Error details:', {
+        name: error instanceof Error ? error.name : 'Unknown',
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : 'No stack trace',
+      });
+      
       const errorMessage = error instanceof Error ? error.message : 'Minting failed';
       setMintState(prev => ({
         ...prev,
@@ -639,6 +722,7 @@ export function ArtistUpload() {
                   )}
                 </div>
               )}
+
       </div>
 
       <div className="space-y-6">

@@ -1,4 +1,4 @@
-# 🎶 Global Art & Music Platform  
+# 🎶 BUSKERS
 
 A decentralized platform for **artists around the world** to showcase, share, and store their work (music, art, media).  
 Powered by **Walrus for storage**, **Kadena blockchain integration**, **PayPal USD (PYUSD) stablecoin**, and a **Next.js frontend** with a **neo-modern minimalist UI**.  

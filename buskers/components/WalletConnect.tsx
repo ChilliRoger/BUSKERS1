@@ -20,18 +20,18 @@ export function WalletConnect() {
     const isCorrectNetwork = chainId === 5920;
     
     return (
-      <div className="flex items-center space-x-3">
+      <div className="flex items-center space-x-3 text-white">
         <div className="text-sm">
-          <p className={`${isCorrectNetwork ? 'text-green-600' : 'text-yellow-600'}`}>
+          <p className={`${isCorrectNetwork ? 'text-green-300' : 'text-yellow-300'}`}>
             {isCorrectNetwork ? 'Connected to Kadena EVM Testnet' : 'Connected (Wrong Network)'}
           </p>
-          <p className="font-mono text-xs text-gray-500">
+          <p className="font-mono text-xs text-gray-200">
             {address.slice(0, 6)}...{address.slice(-4)}
           </p>
         </div>
         <button
           onClick={handleDisconnect}
-          className="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+          className="px-3 py-1 text-sm bg-white text-blue-600 rounded-lg hover:bg-gray-100 transition-colors font-medium"
         >
           Disconnect
         </button>
@@ -46,7 +46,7 @@ export function WalletConnect() {
       className={`px-4 py-2 rounded-lg font-medium transition-colors ${
         isPending
           ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-          : 'bg-blue-600 text-white hover:bg-blue-700'
+          : 'bg-transparent text-white hover:bg-blue-700 border border-white/20'
       }`}
     >
       {isPending ? 'Connecting...' : 'Connect MetaMask'}

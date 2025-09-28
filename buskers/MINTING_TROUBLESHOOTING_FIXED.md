@@ -123,7 +123,7 @@ The app will automatically load configuration from:
     "projectId": "af795a67e519c60d96a18987b1b081fd"
   },
   "tusky": {
-    "apiKey": "your_tusky_api_key_here",
+    "apiKey": "487f9ba3-aea5-4277-8e29-8eccb7e346de",
     "network": "testnet"
   }
 }
@@ -140,7 +140,7 @@ NEXT_PUBLIC_APP_NAME=Buskers
 NEXT_PUBLIC_APP_DESCRIPTION=Decentralized Music Platform
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID=af795a67e519c60d96a18987b1b081fd
-TUSKY_API_KEY=your_tusky_api_key_here
+TUSKY_API_KEY=487f9ba3-aea5-4277-8e29-8eccb7e346de
 TUSKY_NETWORK=testnet
 ```
 

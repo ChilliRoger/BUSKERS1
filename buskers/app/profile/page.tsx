@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAccount } from 'wagmi';
 import { motion } from 'framer-motion';
-import { FaUser, FaMusic, FaPlay, FaPause, FaEdit, FaPlus } from 'react-icons/fa';
+import { FaUser, FaMusic, FaPlay, FaPause, FaPlus } from 'react-icons/fa';
 import { useRole } from '@/components/RoleProvider';
 import toast from 'react-hot-toast';
 
@@ -118,10 +118,6 @@ export default function ProfilePage() {
     toast.success('Redirecting to minting page...');
   };
 
-  const handleEditNFT = (nft: NFT) => {
-    toast.success(`Editing NFT: ${nft.name}`);
-  };
-
   const handleAddNewNFT = () => {
     toast.success('Adding new NFT...');
   };
@@ -134,7 +130,7 @@ export default function ProfilePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="glass-card p-8 shadow-lg mb-8"
+          className="glass-card p-8 shadow-2xl mb-8 border-2 border-indigo-400/40 hover:border-indigo-400/60 transition-all duration-300"
         >
           <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-6 sm:space-y-0 sm:space-x-8">
             {/* Profile Picture */}
@@ -180,7 +176,7 @@ export default function ProfilePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
-          className="glass-card p-6 shadow-lg"
+          className="glass-card p-8 shadow-2xl border-2 border-mint-400/40 hover:border-mint-400/60 transition-all duration-300"
         >
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold text-white flex items-center font-poppins">
@@ -233,7 +229,7 @@ export default function ProfilePage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3, delay: index * 0.1 }}
-                  className="glass-card p-4 shadow-md hover:scale-105 transition-all duration-300 hover-glow"
+                  className="glass-card p-6 shadow-md hover:scale-105 transition-all duration-300 hover-glow border border-gray-600/30 hover:border-gray-500/50"
                 >
                   {/* Album Image */}
                   <div className="mb-4">
@@ -272,42 +268,28 @@ export default function ProfilePage() {
                     </audio>
                   </div>
 
-                  {/* Action Buttons */}
-                  <div className="space-y-2">
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => handlePlayAudio(nft)}
-                      className="w-full gradient-indigo-mint hover:scale-105 text-white font-bold py-2 px-4 rounded-xl transition-all duration-300 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 flex items-center justify-center shadow-md hover:shadow-lg glow-indigo"
-                      aria-label={`${playingAudio === nft.id ? 'Pause' : 'Play'} ${nft.name}`}
-                    >
-                      {playingAudio === nft.id ? (
-                        <>
-                          <FaPause className="mr-2" />
-                          Pause
-                        </>
-                      ) : (
-                        <>
-                          <FaPlay className="mr-2" />
-                          Play Album
-                        </>
-                      )}
-                    </motion.button>
-
-                    {/* Edit Button - Only for artists */}
-                    {userRole === 'artist' && (
+                    {/* Action Buttons */}
+                    <div className="space-y-2">
                       <motion.button
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
-                        onClick={() => handleEditNFT(nft)}
-                        className="w-full gradient-mint-coral hover:scale-105 text-white font-bold py-2 px-4 rounded-xl transition-all duration-300 focus:ring-2 focus:ring-mint-500 focus:ring-offset-2 flex items-center justify-center shadow-md hover:shadow-lg glow-mint"
-                        aria-label={`Edit ${nft.name}`}
+                        onClick={() => handlePlayAudio(nft)}
+                        className="w-full gradient-indigo-mint hover:scale-105 text-white font-bold py-2 px-4 rounded-xl transition-all duration-300 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 flex items-center justify-center shadow-md hover:shadow-lg glow-indigo"
+                        aria-label={`${playingAudio === nft.id ? 'Pause' : 'Play'} ${nft.name}`}
                       >
-                        <FaEdit className="mr-2" />
-                        Edit
+                        {playingAudio === nft.id ? (
+                          <>
+                            <FaPause className="mr-2" />
+                            Pause
+                          </>
+                        ) : (
+                          <>
+                            <FaPlay className="mr-2" />
+                            Play Album
+                          </>
+                        )}
                       </motion.button>
-                    )}
-                  </div>
+                    </div>
                 </motion.div>
               ))}
             </div>

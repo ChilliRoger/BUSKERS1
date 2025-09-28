@@ -41,9 +41,13 @@ export function Navbar() {
           >
             <Link
               href="/"
-              className="text-2xl font-bold text-white hover:text-indigo-400 transition-all duration-300 font-poppins tracking-tight"
+              className="flex items-center text-white hover:text-indigo-400 transition-all duration-300 font-poppins tracking-tight"
             >
-              Buskers
+              <img 
+                src="/11.png" 
+                alt="Buskers Logo" 
+                className="h-10 w-auto hover:scale-105 transition-transform duration-300"
+              />
             </Link>
             {userRole && (
               <motion.span

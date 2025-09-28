@@ -218,7 +218,7 @@ export default function PostsPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
-            className="glass-card p-6 shadow-lg mb-8"
+            className="glass-card p-8 shadow-2xl mb-8 border-2 border-purple-400/40 hover:border-purple-400/60 transition-all duration-300"
           >
           <h2 className="text-2xl font-bold text-white mb-6 flex items-center font-poppins">
             <FaImage className="mr-2 text-mint-400" />
@@ -319,7 +319,7 @@ export default function PostsPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: index * 0.1 }}
-                className="glass-card shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-105 hover-glow"
+                className="glass-card shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-105 hover-glow border border-gray-600/30 hover:border-gray-500/50"
               >
                 <img
                   src={post.image}

@@ -182,7 +182,7 @@ export default function EventsPage() {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
-              className="glass-card p-6 shadow-lg"
+              className="glass-card p-8 shadow-2xl border-2 border-green-400/40 hover:border-green-400/60 transition-all duration-300"
             >
             <h2 className="text-2xl font-bold text-white mb-6 flex items-center font-poppins">
               <MdEvent className="mr-2 text-indigo-400" />
@@ -291,7 +291,7 @@ export default function EventsPage() {
             initial={{ opacity: 0, x: userRole === 'artist' ? 20 : 0 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: userRole === 'artist' ? 0.4 : 0.2, ease: "easeOut" }}
-            className="glass-card p-6 shadow-lg"
+            className="glass-card p-8 shadow-2xl border-2 border-blue-400/40 hover:border-blue-400/60 transition-all duration-300"
           >
             <h2 className="text-2xl font-bold text-white mb-6 font-poppins">
               {userRole === 'artist' ? 'Available Events to Perform At' : 'Events to Book'}
@@ -304,7 +304,7 @@ export default function EventsPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3, delay: index * 0.1 }}
-                  className="glass-card p-4 hover:scale-105 transition-all duration-300 hover-glow"
+                  className="glass-card p-6 hover:scale-105 transition-all duration-300 hover-glow border border-gray-600/30 hover:border-gray-500/50"
                 >
                   <div className="flex space-x-4">
                     <img

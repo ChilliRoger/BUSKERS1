@@ -136,6 +136,4 @@ MIT License © 2025 [Your Name / Team Name]
 
 ---
 
-This way, **PYUSD is clearly explained as the stablecoin backbone** for payments.  
 
-Do you want me to also add a **sample smart contract snippet** (Solidity for PYUSD payments or Kadena Pact for artist registration) inside the README to impress hackathon judges?

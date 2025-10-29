@@ -127,11 +127,6 @@ Push to the branch:
 git push origin feature/amazing-feature
 
 
-Open a Pull Request 🚀
-
-📜 License
-
-MIT License © 2025 [Your Name / Team Name]
 
 
 ---
